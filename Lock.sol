@@ -41,7 +41,7 @@ contract Lock {
     event USDTLog(address addr, uint amount, string txid);
 
     //直接抵押函数
-    function lockLinear(address addr, uint64 timeSlice, uint64 count, string calldata txid ) public payable {
+    function lockLinear(address addr, uint64 timeSlice, uint64 count, string calldata txid) public payable {
         require(msg.value > 0, "value cannot be zero");
         require(address(msg.sender) == address(tx.origin), "no contract");
         require(_enabled, "is disabled");
@@ -121,6 +121,18 @@ contract Lock {
         return users.length;
     }
 
+    function deleteUser(address addr) private {
+        //删除用户
+        uint index = records[addr].index;
+        uint end = users.length - 1;
+        if (index < end) {
+            users[index] = users[end];
+            records[users[end]].index = index;
+        }
+        users.pop();
+        delete records[addr];
+    }
+
     function settle_(address addr) private {
         Record storage curRecord = records[addr];
         uint share = curRecord.value / curRecord.count;
@@ -132,15 +144,7 @@ contract Lock {
             uint amount = curRecord.value - share * curRecord.freeCount;
             curRecord.freeCount = curRecord.count;
             balances[addr] += amount;
-            //删除用户
-            uint index = records[addr].index;
-            uint end = users.length - 1;
-            if (index < end) {
-                users[index] = users[end];
-                records[users[end]].index = index;
-            }
-            users.pop();
-            delete records[addr];
+            deleteUser(addr);
             return;
         }
 
@@ -156,9 +160,10 @@ contract Lock {
     //提取指定余额
     function withdrawAmount(uint amount) public {
         require(address(msg.sender) == address(tx.origin), "no contract");
-        require(records[msg.sender].value > 0, "no record");
+        if (records[msg.sender].value > 0) {
+            settle_(msg.sender);
+        }
 
-        settle_(msg.sender);
         require(balances[msg.sender] >= amount, "not enough");
         balances[msg.sender] -= amount;
         payable(msg.sender).transfer(amount);
@@ -167,19 +172,22 @@ contract Lock {
     //提取全部余额
     function withdrawAll() public {
         require(address(msg.sender) == address(tx.origin), "no contract");
-        require(records[msg.sender].value > 0, "no record");
+        if (records[msg.sender].value > 0) {
+            settle_(msg.sender);
+        }
 
-        settle_(msg.sender);
         uint amount = balances[msg.sender];
         balances[msg.sender] = 0;
         payable(msg.sender).transfer(amount);
     }
 
     function transferLock(address addr) public {
-        require(records[addr].value > 0, "no record");
+        require(records[addr].value == 0, "lock exist");
+        require(addr != msg.sender, "no self");
+
         users.push(addr);
         records[addr] = records[msg.sender];
-        delete records[msg.sender];
+        deleteUser(msg.sender);
     }
 
     //设置开始状态
