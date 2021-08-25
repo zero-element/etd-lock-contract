@@ -56,7 +56,7 @@ contract Lock {
         startTime : uint64(block.timestamp),
         stageOne : 0,
         stageSec : 0,
-        withdrawed: 0
+        withdrawed : 0
         });
 
         users.push(addr);
@@ -142,20 +142,25 @@ contract Lock {
             return;
         }
 
+        if (day < 15) {
+            return;
+        }
+        day -= 15;
+
         //释放第一阶段
-        if (day >= 15 && curRecord.stageOne == 0) {
+        uint shareOne = curRecord.value * 5 / 100;
+        if (curRecord.stageOne == 0) {
             curRecord.stageOne = 1;
-            uint shareOne = curRecord.value * 5 / 100;
             curRecord.withdrawed += shareOne;
             balances[addr] += shareOne;
         }
 
         //释放第二阶段
-        uint secDay = 15 + curRecord.stageSec;
-        if (day > secDay) {
-            uint amount = curRecord.value * (day - secDay) / 540;
+        uint shareSec = curRecord.value - shareOne;
+        if (day > curRecord.stageSec) {
+            uint amount = shareSec * (day - curRecord.stageSec) / 540;
             curRecord.withdrawed += amount;
-            curRecord.stageSec = day - 15;
+            curRecord.stageSec = day;
             balances[addr] += amount;
         }
     }
