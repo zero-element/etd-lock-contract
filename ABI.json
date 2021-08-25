@@ -45,14 +45,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint64",
-        "name": "timeSlice",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint64",
-        "name": "count",
-        "type": "uint64"
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       },
       {
         "internalType": "string",
@@ -60,7 +55,7 @@
         "type": "string"
       }
     ],
-    "name": "lockLinear",
+    "name": "lock540",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -191,16 +186,6 @@
             "internalType": "uint64",
             "name": "startTime",
             "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "slice",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "count",
-            "type": "uint64"
           }
         ],
         "internalType": "struct Lock.QueryResult[]",
@@ -242,16 +227,6 @@
             "internalType": "uint64",
             "name": "startTime",
             "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "slice",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "count",
-            "type": "uint64"
           }
         ],
         "internalType": "struct Lock.QueryResult",
@@ -291,16 +266,6 @@
           {
             "internalType": "uint64",
             "name": "startTime",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "slice",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "count",
             "type": "uint64"
           }
         ],
