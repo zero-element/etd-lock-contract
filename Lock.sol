@@ -23,7 +23,7 @@ contract Lock {
         uint64 startTime;
         //是否已释放首期抵押
         uint64 stageOne;
-        //已释放二期抵押
+        //已释放二期抵押份数
         uint64 stageSec;
         //已释放抵押
         uint withdrawed;
@@ -78,7 +78,7 @@ contract Lock {
     }
 
     //查询指定锁仓
-    function queryAny(address addr) view public onlyOwner returns (QueryResult memory result) {
+    function queryAny(address addr) view public onlyOwner returns (uint, QueryResult memory result) {
         require(records[addr].value > 0, "no record");
         Record storage curRecord = records[addr];
 
@@ -88,11 +88,11 @@ contract Lock {
         withdrawed : curRecord.withdrawed,
         startTime : curRecord.startTime
         });
-        return result;
+        return (block.timestamp, result);
     }
 
     //查询全部锁仓
-    function queryAll(uint start, uint size) view public onlyOwner returns (QueryResult[] memory) {
+    function queryAll(uint start, uint size) view public onlyOwner returns (uint, QueryResult[] memory) {
         require(start + size <= users.length, "overflow");
         QueryResult[] memory result = new QueryResult[](size);
 
@@ -106,7 +106,7 @@ contract Lock {
             startTime : curRecord.startTime
             });
         }
-        return result;
+        return (block.timestamp, result);
     }
 
     function getAllCount() onlyOwner public view returns (uint count) {
