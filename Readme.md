@@ -1,6 +1,6 @@
 ## ETD Lock Contract
 
-address: 0xDA158ecc1A88900e00154Eb83E306eCc48c777D8
+address: 0x3b97CD91e9081EB172E963de48f256B38DE2541B
 
 1. Lock_540（addr, amount, usdtTxid）
 
@@ -22,11 +22,11 @@ address: 0xDA158ecc1A88900e00154Eb83E306eCc48c777D8
 
      查询msg.sender的锁仓列表
 
-5. queryAll _owner(start, size)// [] {addr, lockedAmount, withdrawed, startTime}
+5. queryAll _owner(start, size)// {now, []{addr, lockedAmount, withdrawed, startTime}}
 
      查询所有的锁仓详情，owner权限
 
-6. queryAny _owner(addr) // {addr, lockedAmount, withdrawed, startTime}
+6. queryAny _owner(addr) // {now, addr, lockedAmount, withdrawed, startTime}
 
      查询addr的锁仓详情，owner权限
 
