@@ -71,7 +71,7 @@ contract Lock {
         result = QueryResult({
         addr : msg.sender,
         lockedAmount : curRecord.value,
-        withdrawed : curRecord.withdrawed,
+        withdrawed : curRecord.withdrawed - balances[msg.sender],
         startTime : curRecord.startTime
         });
         return (block.timestamp, result);
@@ -85,7 +85,7 @@ contract Lock {
         result = QueryResult({
         addr : addr,
         lockedAmount : curRecord.value,
-        withdrawed : curRecord.withdrawed,
+        withdrawed : curRecord.withdrawed - balances[addr],
         startTime : curRecord.startTime
         });
         return (block.timestamp, result);
@@ -102,7 +102,7 @@ contract Lock {
             result[i - start] = QueryResult({
             addr : users[i],
             lockedAmount : curRecord.value,
-            withdrawed : curRecord.withdrawed,
+            withdrawed : curRecord.withdrawed - balances[users[i]],
             startTime : curRecord.startTime
             });
         }
@@ -125,7 +125,8 @@ contract Lock {
         delete records[addr];
     }
 
-    function settle_(address addr) private {
+    //结算锁仓，返回是否已结清
+    function settle_(address addr) private returns (bool) {
         Record storage curRecord = records[addr];
         uint curTime = block.timestamp;
 
@@ -134,16 +135,19 @@ contract Lock {
         if (day >= 555) {// 15+540
             //剩余抵押
             uint amount = curRecord.value - curRecord.withdrawed;
+            //已结清
+            if (amount == 0) {
+                return true;
+            }
             curRecord.stageOne = 1;
             curRecord.stageSec = 540;
             curRecord.withdrawed = curRecord.value;
             balances[addr] += amount;
-            deleteUser(addr);
-            return;
+            return true;
         }
 
         if (day < 15) {
-            return;
+            return false;
         }
         day -= 15;
 
@@ -163,13 +167,14 @@ contract Lock {
             curRecord.stageSec = day;
             balances[addr] += amount;
         }
+        return false;
     }
 
     //提取指定余额
     function withdrawAmount(uint amount) public {
         require(address(msg.sender) == address(tx.origin), "no contract");
-        if (records[msg.sender].value > 0) {
-            settle_(msg.sender);
+        if (settle_(msg.sender) && amount == balances[msg.sender]) {
+            deleteUser(msg.sender);
         }
 
         require(balances[msg.sender] >= amount, "not enough");
@@ -180,8 +185,8 @@ contract Lock {
     //提取全部余额
     function withdrawAll() public {
         require(address(msg.sender) == address(tx.origin), "no contract");
-        if (records[msg.sender].value > 0) {
-            settle_(msg.sender);
+        if (settle_(msg.sender)) {
+            deleteUser(msg.sender);
         }
 
         uint amount = balances[msg.sender];
