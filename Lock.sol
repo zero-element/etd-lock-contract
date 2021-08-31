@@ -196,7 +196,7 @@ contract Lock {
 
     function transferLock(address addr) public {
         require(records[addr].value == 0, "lock exist");
-        require(addr != msg.sender, "no self");
+        require(addr != msg.sender && addr != address(0), "no self");
 
         users.push(addr);
         records[addr] = records[msg.sender];
