@@ -1,7 +1,7 @@
 ## ETD Lock Contract
 
-address: 0x2A7f9509eebF1a50f1103A8e51ED6009c56641d9
-minutes version address: 0xCbA7E6074e250c3CbB782811B294BcAc40310E5A
+address: 0x4b5116c166e7E1682335fE50ACB9e7C01e34b14c
+minutes version address: 0x2c8AAbD89dCc7aD8a8426011367680cAE267175B
 
 1. Lock_540（addr, amount, usdtTxid）
 

@@ -40,7 +40,7 @@ contract Lock {
         owner = msg.sender;
     }
 
-    event USDTLog(address addr, uint amount, string txid);
+    event USDTLog(address indexed addr, uint amount, string txid);
 
     //直接抵押函数
     function lock540(address addr, uint amount, string calldata txid) public payable {
